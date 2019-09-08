@@ -79,9 +79,9 @@ class AuthController extends Controller
        $this->user->name = $request->name;
        $this->user->email = $request->email;
        $this->user->password = Hash::make($request->password);
-       $this->user->image = $file_name;
+      $this->user->image = $file_name;
        $this->user->save();
-    file_put_contents("./profile_images/".$file_name, $fileBin);
+   file_put_contents("./profile_images/".$file_name, $fileBin);
     return response()->json([
         "success"=>true,
         "message"=>"user registered successfully",
@@ -113,16 +113,21 @@ class AuthController extends Controller
        {
         return response()->json([
             "success"=>false,
-            "message"=>"invalid email ot password",
+            "message"=>"invalid email or password",
         ],401); 
        }
      
        $user_image = "";
        $user = auth("users")->authenticate($jwt_token);
         $user_image = $user->image;
+
+
+    $base64_content = file_get_contents("./profile_images/".$user_image);
+    $encode_file = base64_encode($base64_content);
+
        return response()->json([
         "success"=>true,
-         "image"=>$this->base_url."/"."profile_images"."/".$user_image,
+         "image"=>'data:image/jpg;base64,'.$encode_file,
         "token"=>$jwt_token,
     ],200);
        
